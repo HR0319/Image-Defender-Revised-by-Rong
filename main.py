@@ -29,24 +29,26 @@ data_loader = DataLoader(cifar10_dataset, batch_size=1, shuffle=True)
 original_image, original_label = next(iter(data_loader))
 
 # 定义攻击参数和校正因子
-epsilon = 0.1
-threshold = 0.1
+epsilon = 0.03
+alpha = 0.0015
+iterations = 80
+
 correction_factor = 0.5
 
 # 攻击图像
 ground_truth_labels = torch.tensor([2])
-perturbed_image = adversarial_attack(model, original_image, label=ground_truth_labels, epsilon=epsilon)
+perturbed_image = adversarial_attack(model, original_image, label=ground_truth_labels, epsilon=epsilon, alpha=alpha, iterations=iterations)
 
 # 分离攻击和未受攻击的部分
-attacked_part, unattacked_part = separate_attack(model, original_image, perturbed_image, threshold=threshold)
+attacked_part, unattacked_part = separate_attack(model, original_image, perturbed_image)
 
 # 校正攻击后的部分
-corrected_part = correct_attack(original_image, attacked_part)
 
+corrected_part = correct_attack(model, original_image, attacked_part, max_iterations=100, lr=0.01)
 
 # 将未受攻击的部分和校正后的部分结合
-not_attacked_part = 1 - attacked_part
-combined_image = combine_parts(original_image, not_attacked_part, corrected_part)
+# not_attacked_part = 1 - attacked_part
+combined_image = combine_parts(original_image, unattacked_part, corrected_part)
 
 test(combined_image, original_image)
 # 显示结果
