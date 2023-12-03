@@ -52,4 +52,4 @@ def adversarial_attack(model, image, label, epsilon, alpha, iterations):
     # 将最终扰动图像的像素值限制在[0, 1]范围内
     perturbed_image = torch.clamp(perturbed_image, 0, 1)
 
-    return perturbed_imag
+    return perturbed_image
